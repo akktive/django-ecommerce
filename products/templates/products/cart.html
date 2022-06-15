@@ -1,0 +1,107 @@
+{% extends 'products/base.html' %}
+{% load static %}
+
+{% block navbar %}
+    {% for category in categories %}
+        <li><a class="nav-link" href="{{ category.get_url }}">{{ category }}</a></li>
+    {% endfor %}
+{% endblock navbar %}
+
+{% block content %}
+    <div class="row">
+        <div class="col-lg-12">
+            <div class="box-element">
+                <a  class="btn btn-outline-dark" href="{% url 'mainpage-url' %}">&#x2190; Продолжить покупки</a>
+                <br>
+                <br>
+                <table class="table">
+                    <tr>
+                        <th><h5>Кол-во товаров: <strong>{{ order.get_cart_items }}</strong></h5></th>
+                        <th><h5>Итого: <strong>₽{{ order.get_cart_total }}</strong></h5></th>
+                        <th>
+                            <button style="float:right; margin:5px;" class="btn btn-success" id="make-payment" >Оплатить заказ</button>
+                        </th>
+                    </tr>
+                </table>
+            </div>
+
+
+			<br>
+			<div class="box-element">
+				<div class="cart-row">
+					<div style="flex:2"></div>
+					<div style="flex:2"><strong>Товар</strong></div>
+					<div style="flex:1"><strong>Цена</strong></div>
+					<div style="flex:1"><strong>Кол-во</strong></div>
+					<div style="flex:1"><strong>Итого</strong></div>
+				</div>
+                {% for item in items %}
+                    <div class="cart-row">
+                        <div style="flex:2"><img class="row-image" src="{{ item.product.imageURL }}"></div>
+                        <div style="flex:2"><p>{{ item.product.name }}</p></div>
+                        <div style="flex:1"><p>₽{{ item.product.price }}</p></div>
+                        <div style="flex:1">
+                            <p class="quantity">{{ item.quantity }}</p>
+                            <div class="quantity">
+                                <img data-product={{item.product.id}} data-action="add" class="chg-quantity update-cart" src="{% static  'products/img/arrow-up.png' %}">
+
+                                <img data-product={{item.product.id}} data-action="remove" class="chg-quantity update-cart" src="{% static  'products/img/arrow-down.png' %}">
+                            </div>
+                        </div>
+                        <div style="flex:1"><p>₽{{ item.get_total }}</p></div>
+                    </div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+
+<script type="text/javascript">
+
+    var total = '{{order.get_cart_total}}'
+
+    document.getElementById('make-payment')?.addEventListener('click', function(e){
+        submitFormData()
+    })
+
+    function submitFormData(){
+        console.log('Payment butt clicked!')
+
+        var userFormData = {
+            'name':null,
+            'email':null,
+            'total':total,
+        }
+
+        var url = "/process_order/"
+        fetch(url, {
+            method:'POST',
+            headers:{
+                'Content-Type':'applicaiton/json',
+                'X-CSRFToken':csrftoken,
+            },
+            body:JSON.stringify({'form':userFormData}),
+
+        })
+        .then((response) => response.json())
+        .then((data) => {
+            if (user == 'AnonymousUser'){
+                alert('Войдите в аккаунт!');
+                window.location.href = "{% url 'reg-url' %}"
+                console.log(window.location.href)
+        }else{
+            if (userFormData.total == 0){
+                alert('Ошибка! Корзина пуста');
+            }else{
+            console.log('Success:', data);
+            alert('Заказ сохранён! Спасибо!');
+
+            cart = {}
+            document.cookie ='cart=' + JSON.stringify(cart) + ";domain=;path=/"
+
+            window.location.href = "{% url 'mainpage-url' %}"
+            }
+        }})
+    }
+
+</script>
+{% endblock content %}

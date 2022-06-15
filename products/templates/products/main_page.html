@@ -1,0 +1,29 @@
+{% extends 'products/base.html' %}
+{% load static %}
+
+{% block navbar %}
+    {% for category in categories %}
+        <li><a class="nav-link" href="{{ category.get_url }}">{{ category }}</a></li>
+    {% endfor %}
+{% endblock navbar %}
+
+{% block content %}
+	{% if request.user.is_authenticated %}
+		<h1 style="text-align:center;">Добро пожаловать, {{ user }}!</h1>
+	{% else %}
+		<h1 style="text-align:center;">Для совершения покупки войдите в аккаунт!</h1>
+	{% endif %}
+	<div class="row">
+		{% for product in products %}
+			<div class="col-lg-4">
+				<img class="thumbnail" src="{{ product.imageURL }}">
+				<div class="box-element product">
+					<h6><strong>{{ product }}</strong></h6>
+					<hr>
+					<button data-product={{product.id}} data-action="add" class="btn btn-outline-secondary add-btn update-cart">Добавить в корзину</button>
+					<h4 style="display: inline-block; float: right; font-size: 20px;"><strong>₽{{ product.price }}</strong></h4>
+				</div>
+			</div>
+		{% endfor %}
+	</div>
+{% endblock content %}

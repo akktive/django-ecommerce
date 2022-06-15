@@ -1,0 +1,21 @@
+{% extends 'products/base.html' %}
+{% load static %}
+
+{% block navbar %}
+    {% for category in categories %}
+        <li><a class="nav-link" href="{{ category.get_url }}">{{ category }}</a></li>
+    {% endfor %}
+{% endblock navbar %}
+
+{% block content %}
+
+    <h1>Вход в аккаунт</h1>
+    <form method="post">
+        {{ form }}
+        {% csrf_token %}
+        <br>
+        <br>
+        <input type="submit" value="Войти">
+    </form>
+
+{% endblock content %}
